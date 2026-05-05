@@ -23,8 +23,8 @@ export default function DownNav() {
   const navRef = useRef(null);
 
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (navRef.current && !navRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (navRef.current && !(navRef.current as any).contains(event.target)) {
         setActiveMenu(null);
       }
     }
@@ -32,8 +32,8 @@ export default function DownNav() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleMenu = (menuName) => {
-    setActiveMenu(activeMenu === menuName ? null : menuName);
+  const toggleMenu = (menuName: string)  => {
+    setActiveMenu(activeMenu === menuName ? null : menuName as any);
   };
 
   return (
