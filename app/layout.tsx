@@ -29,6 +29,22 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <link
+          rel="preload"
+          as="video"
+          href="/videos/desktop.mp4"
+          type="video/mp4"
+          media="(min-width: 768px)"
+        />
+        <link
+          rel="preload"
+          as="video"
+          href="/videos/mobile.mp4"
+          type="video/mp4"
+          media="(max-width: 767px)"
+        />
+      </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppRouterCacheProvider>
           {children}

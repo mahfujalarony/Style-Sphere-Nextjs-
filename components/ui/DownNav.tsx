@@ -1,114 +1,213 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { Button, Menu, MenuItem } from '@mui/material';
 
-const luxuryItems = [
-  { name: 'Bag', href: '#' },
-  { name: 'Shoe', href: '#' },
-  { name: 'Watch', href: '#' },
-  { name: 'JEWELLRY', href: '#', hasArrow: true },
-];
+type CategoryItem = {
+  name: string;
+  href: string;
+  group: 'inStore' | 'luxury' | 'nav';
+  hasArrow?: boolean;
+};
 
-const inStoreItems = [
-  { name: 'New Arrivals', href: '#' },
-  { name: 'Best Sellers', href: '#' },
-  { name: 'Exclusive Collection', href: '#' },
-  { name: 'Discounted Items', href: '#' },
-];
+type CategoryResponse = {
+  inStore: CategoryItem[];
+  luxury: CategoryItem[];
+  nav: CategoryItem[];
+};
+
+const emptyCategories: CategoryResponse = {
+  inStore: [],
+  luxury: [],
+  nav: [],
+};
 
 export default function DownNav() {
-  const [activeMenu, setActiveMenu] = useState(null); 
-  const navRef = useRef(null);
+  const [categories, setCategories] = useState<CategoryResponse>(emptyCategories);
+  const [inStoreAnchor, setInStoreAnchor] = useState<null | HTMLElement>(null);
+  const [luxuryAnchor, setLuxuryAnchor] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (navRef.current && !(navRef.current as any).contains(event.target)) {
-        setActiveMenu(null);
+    const loadCategories = async () => {
+      try {
+        const response = await fetch('/api/client/categories');
+        if (!response.ok) {
+          throw new Error('Failed to load categories');
+        }
+        const data = (await response.json()) as { categories?: CategoryResponse };
+        if (data.categories) {
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        setCategories(emptyCategories);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    };
+
+    loadCategories();
   }, []);
 
-  const toggleMenu = (menuName: string)  => {
-    setActiveMenu(activeMenu === menuName ? null : menuName as any);
+  const openInStore = (event: React.MouseEvent<HTMLElement>) => {
+    setInStoreAnchor(event.currentTarget);
   };
 
+  const openLuxury = (event: React.MouseEvent<HTMLElement>) => {
+    setLuxuryAnchor(event.currentTarget);
+  };
+
+  const closeInStore = () => setInStoreAnchor(null);
+  const closeLuxury = () => setLuxuryAnchor(null);
+
   return (
-    <header className="w-full bg-transparent font-sans relative z-[100]" ref={navRef}>
+    <header className="w-full  bg-transparent font-sans relative z-[100]">
       <div className="max-w-7xl mx-auto px-4 relative">
         
         {/* Navigation Bar */}
-        <nav className="flex items-center space-x-8 md:space-x-10 py-6 overflow-x-auto md:overflow-visible flex-nowrap scrollbar-hide">
+        <nav className="flex items-center justify-center space-x-8 md:space-x-10 py-6 overflow-x-auto md:overflow-visible flex-nowrap scrollbar-hide">
           
           {/* IN STORE PRODUCTS */}
-          <button 
-            onClick={() => toggleMenu('inStore')}
-            className="flex items-center space-x-1 shrink-0 outline-none"
-          >
-            <span className={`text-[12px] md:text-[13px] font-semibold uppercase tracking-wide transition-colors ${activeMenu === 'inStore' ? 'text-blue-600' : 'text-gray-800'}`}>
+          {categories.inStore.length > 0 && (
+            <Button
+              onClick={openInStore}
+              endIcon={<ChevronDown size={14} />}
+              className="shrink-0"
+              variant="text"
+              sx={{
+                px: 1,
+                minWidth: 0,
+                color: inStoreAnchor ? '#2563eb' : '#1f2937',
+                fontSize: '12px',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+              }}
+            >
               In Store Products
-            </span>
-            {activeMenu === 'inStore' ? <ChevronUp size={14} className="text-blue-600" /> : <ChevronDown size={14} className="text-gray-800" />}
-          </button>
+            </Button>
+          )}
 
           {/* LUXURY AUTHENTIC */}
-          <button 
-            onClick={() => toggleMenu('luxury')}
-            className="flex items-center space-x-1 shrink-0 outline-none"
-          >
-            <span className={`text-[12px] md:text-[13px] font-bold uppercase tracking-wide transition-colors ${activeMenu === 'luxury' ? 'text-red-600' : 'text-gray-800'}`}>
-              LUXURY AUTHENTIC
-            </span>
-            {activeMenu === 'luxury' ? <ChevronUp size={14} className="text-red-600" /> : <ChevronDown size={14} className="text-gray-800" />}
-          </button>
+          {categories.luxury.length > 0 && (
+            <Button
+              onClick={openLuxury}
+              endIcon={<ChevronDown size={14} />}
+              className="shrink-0"
+              variant="text"
+              sx={{
+                px: 1,
+                minWidth: 0,
+                color: luxuryAnchor ? '#2563eb' : '#1f2937',
+                fontSize: '12px',
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+              }}
+            >
+              Luxury Authentic
+            </Button>
+          )}
 
           {/* Regular Links */}
-          {['Handbag', 'Footwears', 'Watches', 'Jewelry'].map((item) => (
-            <Link 
-              key={item}
-              href="#" 
+          {categories.nav.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
               className="text-[12px] md:text-[13px] font-semibold text-gray-800 uppercase tracking-wide hover:text-black shrink-0 transition-colors"
             >
-              {item}
+              {item.name}
             </Link>
           ))}
         </nav>
 
 
-        <div className="absolute left-4 right-4 md:left-auto md:right-auto z-[999]">
-          
-          {/* In Store Dropdown */}
-          {activeMenu === 'inStore' && (
-            <div className="mt-2 w-full md:w-72 bg-white rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-50 p-6 md:p-8 animate-in fade-in slide-in-from-top-2">
-              <h3 className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 md:mb-6">Store Categories</h3>
-              <div className="flex flex-col space-y-4 md:space-y-5">
-                {inStoreItems.map((item) => (
-                  <Link key={item.name} href={item.href} className="text-[14px] md:text-[15px] font-medium text-slate-700 hover:text-black transition-colors">
-                    {item.name}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+        <Menu
+          anchorEl={inStoreAnchor}
+          open={Boolean(inStoreAnchor)}
+          onClose={closeInStore}
+          slotProps={{
+            paper: {
+              sx: {
+                mt: 2,
+                minWidth: 260,
+                borderRadius: '20px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
+                border: '1px solid #f1f5f9',
+                px: 1.5,
+                py: 1.5,
+              },
+            },
+            list: {
+              onMouseLeave: closeInStore,
+              sx: { py: 0 },
+            },
+          }}
+        >
+          <div className="px-3 pt-2 pb-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Store Categories</p>
+          </div>
+          {categories.inStore.map((item) => (
+            <MenuItem
+              key={item.name}
+              onClick={closeInStore}
+              component={Link}
+              href={item.href}
+              sx={{
+                fontSize: '14px',
+                fontWeight: 500,
+                color: '#334155',
+                borderRadius: '12px',
+              }}
+            >
+              {item.name}
+            </MenuItem>
+          ))}
+        </Menu>
 
-          {/* Luxury Dropdown */}
-          {activeMenu === 'luxury' && (
-            <div className="mt-2 w-full md:w-72 bg-white rounded-[20px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-50 p-6 md:p-8 animate-in fade-in slide-in-from-top-2">
-              <h3 className="text-[10px] md:text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 md:mb-6">LUXURY AUTHENTIC</h3>
-              <div className="flex flex-col space-y-4 md:space-y-5">
-                {luxuryItems.map((item) => (
-                  <Link key={item.name} href={item.href} className="flex items-center justify-between text-[14px] md:text-[15px] font-medium text-slate-700 hover:text-black transition-colors group/item">
-                    {item.name}
-                    {item.hasArrow && <ChevronRight size={16} className="text-slate-300 group-hover/item:text-black" />}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        <Menu
+          anchorEl={luxuryAnchor}
+          open={Boolean(luxuryAnchor)}
+          onClose={closeLuxury}
+          slotProps={{
+            paper: {
+              sx: {
+                mt: 2,
+                minWidth: 260,
+                borderRadius: '20px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
+                border: '1px solid #f1f5f9',
+                px: 1.5,
+                py: 1.5,
+              },
+            },
+            list: {
+              onMouseLeave: closeLuxury,
+              sx: { py: 0 },
+            },
+          }}
+        >
+          <div className="px-3 pt-2 pb-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Luxury Authentic</p>
+          </div>
+          {categories.luxury.map((item) => (
+            <MenuItem
+              key={item.name}
+              onClick={closeLuxury}
+              component={Link}
+              href={item.href}
+              sx={{
+                fontSize: '14px',
+                fontWeight: 500,
+                color: '#334155',
+                borderRadius: '12px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                gap: 1,
+              }}
+            >
+              {item.name}
+              {item.hasArrow && <ChevronRight size={16} className="text-slate-300" />}
+            </MenuItem>
+          ))}
+        </Menu>
       </div>
 
       <style jsx global>{`

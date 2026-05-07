@@ -2,6 +2,8 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import CollectionShowcase from "@/components/CollectionShowcase";
 import HomeSliderProducts from "@/components/HomeSliderProducts";
+import Reels from "@/components/Reels";
+import ExploreMore from "@/components/ExploreMore";
 
 
 export default function Home() {
@@ -15,6 +17,8 @@ export default function Home() {
           loop
           muted
           playsInline
+          preload="auto"
+          poster="/videos/desktop_t.png"
           className="hidden md:block absolute top-0 left-0 w-full h-full object-cover z-0"
         >
           <source src="/videos/desktop.mp4" type="video/mp4" />
@@ -26,6 +30,8 @@ export default function Home() {
           loop
           muted
           playsInline
+          preload="auto"
+          poster="/videos/mobile_t.png"
           className="block md:hidden absolute top-0 left-0 w-full h-full object-cover z-0"
         >
           <source src="/videos/mobile.mp4" type="video/mp4" />
@@ -48,6 +54,13 @@ export default function Home() {
 
 
       <HomeSliderProducts />
+
+      
+      <Reels />
+
+
+
+      <ExploreMore />
 
     </main>
   );

@@ -1,90 +1,47 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
-import ProductCard from './ProductCard';
+import React, { useEffect, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import ProductCard from "./ProductCard";
 
 // Swiper styles
-import 'swiper/css';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/pagination";
 
-const productData = [
-  {
-    id: 1,
-    title: "Tory Burch Mellow T-Strep sandal",
-    image: "/products/products_1.jpg", 
-    originalPrice: 21000,
-    discountPrice: 12000,
-    discountTag: "৳9000 OFF"
-  },
-  {
-    id: 2,
-    title: "Tory Burch Lnes Slide",
-    image: "/products/products_2.jpg",
-    originalPrice: 21700,
-    discountPrice: 13700,
-    discountTag: "৳8000 OFF"
-  },
-  {
-    id: 3,
-    title: "Tory Burch Ines Sport Slide",
-    image: "/products/products_3.jpg",
-    originalPrice: 22700,
-    discountPrice: 13700,
-    discountTag: "৳9000 OFF"
-  },
-  {
-    id: 4,
-    title: "Tory Burch Elwanor Slide",
-    image: "/products/products_4.jpg",
-    originalPrice: 20000,
-    discountPrice: 13000,
-    discountTag: "৳7000 OFF"
-  },
-  {
-    id: 5,
-    title: "Premium Luxury Slide",
-    image: "/products/products_5.jpg",
-    originalPrice: 25000,
-    discountPrice: 15000,
-    discountTag: "৳10000 OFF"
-  },
-  {
-    id: 6,
-    title: "Elegant Designer Slide",
-    image: "/products/products_6.jpg",
-    originalPrice: 23000,
-    discountPrice: 14000,
-    discountTag: "৳9000 OFF"
-  },
-  {
-    id: 7,
-    title: "Stylish Fashion Slide",
-    image: "/products/products_7.jpg",
-    originalPrice: 22000,
-    discountPrice: 13000,
-    discountTag: "৳9000 OFF"
-  },
-  {
-    id: 8,
-    title: "Chic Luxury Slide",
-    image: "/products/products_8.jpg",
-    originalPrice: 24000,
-    discountPrice: 16000,
-    discountTag: "৳8000 OFF"
-  },
-  {
-    id: 9,
-    title: "Trendy Luxury Slide",
-    image: "/products/products_9.jpg",
-    originalPrice: 26000,
-    discountPrice: 17000,
-    discountTag: "৳9000 OFF"
-  },
-];
+type SliderProduct = {
+  _id?: string;
+  title: string;
+  image: string;
+  originalPrice: number;
+  discountPrice?: number;
+  discountTag?: string;
+};
+
+
 
 const HomeSliderProducts = () => {
+  const [products, setProducts] = useState<SliderProduct[]>([]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const response = await fetch("/api/client/products");
+        if (!response.ok) {
+          throw new Error("Failed to load products");
+        }
+        const data = (await response.json()) as { products?: SliderProduct[] };
+        setProducts(data.products ?? []);
+      } catch (error) {
+        setProducts([]);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  const sliderProducts = products;
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <Swiper
@@ -103,14 +60,14 @@ const HomeSliderProducts = () => {
         }}
         className="pb-12"
       >
-        {productData.map((product) => (
-          <SwiperSlide key={product.id}>
+        {sliderProducts.map((product, index) => (
+          <SwiperSlide key={product._id ?? index}>
             <ProductCard 
               image={product.image}
               title={product.title}
               originalPrice={product.originalPrice}
-              discountPrice={product.discountPrice}
-              discountTag={product.discountTag}
+              discountPrice={product.discountPrice || 0}
+              discountTag={product.discountTag || ''}
             />
           </SwiperSlide>
         ))}

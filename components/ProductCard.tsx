@@ -16,9 +16,9 @@ const ProductCard = ({ image, title, originalPrice, discountPrice, discountTag }
     <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden group h-full">
       {/* Image Section */}
       <div className="relative aspect-[4/5] overflow-hidden">
-        <img 
-          src={image} 
-          alt={title} 
+        <img
+          src={image}
+          alt={title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         
