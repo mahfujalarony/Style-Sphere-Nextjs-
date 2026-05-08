@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import ProductCard from "./ProductCard";
@@ -62,13 +63,25 @@ const HomeSliderProducts = () => {
       >
         {sliderProducts.map((product, index) => (
           <SwiperSlide key={product._id ?? index}>
-            <ProductCard 
-              image={product.image}
-              title={product.title}
-              originalPrice={product.originalPrice}
-              discountPrice={product.discountPrice || 0}
-              discountTag={product.discountTag || ''}
-            />
+            {product._id ? (
+              <Link href={`/products/${product._id}`} className="block">
+                <ProductCard
+                  image={product.image}
+                  title={product.title}
+                  originalPrice={product.originalPrice}
+                  discountPrice={product.discountPrice || 0}
+                  discountTag={product.discountTag || ""}
+                />
+              </Link>
+            ) : (
+              <ProductCard
+                image={product.image}
+                title={product.title}
+                originalPrice={product.originalPrice}
+                discountPrice={product.discountPrice || 0}
+                discountTag={product.discountTag || ""}
+              />
+            )}
           </SwiperSlide>
         ))}
       </Swiper>

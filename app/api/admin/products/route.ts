@@ -53,6 +53,7 @@ export async function POST(request: Request) {
     const discountTag = String(formData.get("discountTag") ?? "").trim();
     const colorsRaw = String(formData.get("colors") ?? "").trim();
     const sizesRaw = String(formData.get("sizes") ?? "").trim();
+    const sizeGuide = String(formData.get("sizeGuide") ?? "").trim();
 
     const imageFiles = formData.getAll("images").filter((file) => file instanceof File) as File[];
 
@@ -97,6 +98,7 @@ export async function POST(request: Request) {
       discountTag: discountTag || undefined,
       colors: parseColors(colorsRaw),
       sizes: parseList(sizesRaw),
+      sizeGuide,
     });
 
     return NextResponse.json({ product }, { status: 201 });

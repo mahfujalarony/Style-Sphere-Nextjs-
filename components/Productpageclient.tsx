@@ -6,7 +6,6 @@ import {
   Box,
   Container,
   Drawer,
-  Grid,
   IconButton,
   Typography,
   useMediaQuery,
@@ -101,7 +100,7 @@ export default function ProductPageClient({
             >
               Category
             </Typography>
-            <Typography variant="h5" fontWeight={700} color="text.primary" sx={{ mt: 0.3, lineHeight: 1.2 }}>
+            <Typography variant="h5" color="text.primary" sx={{ mt: 0.3, lineHeight: 1.2, fontWeight: 700 }}>
               {categoryName}
             </Typography>
           </Box>
@@ -129,7 +128,7 @@ export default function ProductPageClient({
                   }}
                 >
                   <TuneIcon sx={{ fontSize: 18 }} />
-                  <Typography variant="caption" fontWeight={600} sx={{ fontSize: 12 }}>
+                  <Typography variant="caption" sx={{ fontSize: 12, fontWeight: 600 }}>
                     Filter
                   </Typography>
                 </IconButton>
@@ -164,10 +163,12 @@ export default function ProductPageClient({
             anchor="left"
             open={drawerOpen}
             onClose={() => setDrawerOpen(false)}
-            PaperProps={{
-              sx: {
-                width: 280,
-                pt: 1,
+            slotProps={{
+              paper: {
+                sx: {
+                  width: 280,
+                  pt: 1,
+                },
               },
             }}
           >
@@ -182,7 +183,7 @@ export default function ProductPageClient({
                 borderColor: "divider",
               }}
             >
-              <Typography fontWeight={700} fontSize={15}>
+              <Typography sx={{ fontWeight: 700, fontSize: 15 }}>
                 Filters
               </Typography>
               <IconButton size="small" onClick={() => setDrawerOpen(false)}>
@@ -210,9 +211,19 @@ export default function ProductPageClient({
                 No products found. Try removing some filters.
               </Box>
             ) : (
-              <Grid container spacing={1.5}>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "repeat(2, minmax(0, 1fr))",
+                    sm: "repeat(3, minmax(0, 1fr))",
+                    lg: "repeat(4, minmax(0, 1fr))",
+                  },
+                  gap: 1.5,
+                }}
+              >
                 {products.map((product) => (
-                  <Grid key={product._id} item xs={6} sm={4} md={4} lg={3}>
+                  <Box key={product._id} sx={{ minWidth: 0 }}>
                     <Link href={`/products/${product._id}`} style={{ display: "block", textDecoration: "none" }}>
                       <ProductCard2
                         image={product.images?.[0] ?? ""}
@@ -222,9 +233,9 @@ export default function ProductPageClient({
                         discountTag={product.discountTag ?? undefined}
                       />
                     </Link>
-                  </Grid>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             )}
           </Box>
         </Box>

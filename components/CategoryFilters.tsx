@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -15,27 +16,7 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import { useRouter, usePathname } from "next/navigation";
-import { useCallback } from "react";
-
-const COLOR_OPTIONS = [
-  { label: "Sea green", value: "sea green", hex: "#4caf50" },
-  { label: "Black", value: "black", hex: "#222222" },
-  { label: "Nude", value: "nude", hex: "#e8c9a0" },
-  { label: "Pink", value: "pink", hex: "#f48fb1" },
-  { label: "Green", value: "green", hex: "#388e3c" },
-  { label: "Brown", value: "brown", hex: "#795548" },
-  { label: "Beige", value: "beige", hex: "#d7ccc8" },
-  { label: "Golden", value: "golden", hex: "#ffd54f" },
-  { label: "White", value: "white", hex: "#ffffff" },
-  { label: "Silver", value: "silver", hex: "#90a4ae" },
-  { label: "Maroon", value: "maroon", hex: "#880e4f" },
-  { label: "Magenta", value: "magenta", hex: "#e040fb" },
-  { label: "Yellow", value: "yellow", hex: "#fff176" },
-  { label: "Olive", value: "olive", hex: "#80cbc4" },
-  { label: "Sky blue", value: "sky blue", hex: "#64b5f6" },
-  { label: "Metallic Gold", value: "metallic gold", hex: "#d4a017" },
-  { label: "Metallic Iron Gold", value: "metallic iron gold", hex: "#b87333" },
-];
+import { PRODUCT_COLOR_OPTIONS, toTitleCase } from "@/lib/productOptions";
 
 const SORT_OPTIONS = [
   { label: "Newest First", value: "newest" },
@@ -70,13 +51,32 @@ export default function CategoryFilters({
 }: CategoryFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const initialRange: [number, number] = [
+    minValue > 0 ? minValue : minPrice,
+    maxValue > 0 ? maxValue : maxPrice,
+  ];
+  const [priceRange, setPriceRange] = useState<[number, number]>(initialRange);
+
+  useEffect(() => {
+    setPriceRange(initialRange);
+  }, [initialRange[0], initialRange[1]]);
+
+  const colorOptions = useMemo(() => {
+    const knownColors = PRODUCT_COLOR_OPTIONS.filter((color) => colors.includes(color.value));
+    const knownValues = new Set<string>(knownColors.map((color) => color.value));
+    const unknownColors = colors
+      .filter((color) => !knownValues.has(color))
+      .map((color) => ({ label: toTitleCase(color), value: color, hex: "#f8fafc" }));
+
+    return [...knownColors, ...unknownColors];
+  }, [colors]);
 
   const updateParams = useCallback(
     (updates: Record<string, string | string[] | null>) => {
       const params = new URLSearchParams();
 
       if (sortValue && sortValue !== "newest") params.set("sort", sortValue);
-      if (minValue > 0) params.set("min", String(minValue));
+      if (minValue > minPrice) params.set("min", String(minValue));
       if (maxValue > 0 && maxValue < maxPrice) params.set("max", String(maxValue));
       selectedColors.forEach((c) => params.append("color", c));
       selectedSizes.forEach((s) => params.append("size", s));
@@ -88,9 +88,10 @@ export default function CategoryFilters({
         else params.set(key, val);
       });
 
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
-    [router, pathname, sortValue, minValue, maxValue, maxPrice, selectedColors, selectedSizes]
+    [router, pathname, sortValue, minValue, maxValue, minPrice, maxPrice, selectedColors, selectedSizes]
   );
 
   const handleSort = (val: string) => updateParams({ sort: val });
@@ -107,8 +108,15 @@ export default function CategoryFilters({
   };
 
   const handlePriceChange = (_: Event, val: number | number[]) => {
+    setPriceRange(val as [number, number]);
+  };
+
+  const handlePriceCommit = (_: Event | React.SyntheticEvent, val: number | number[]) => {
     const [lo, hi] = val as number[];
-    updateParams({ min: String(lo), max: String(hi) });
+    updateParams({
+      min: lo > minPrice ? String(lo) : null,
+      max: hi < maxPrice ? String(hi) : null,
+    });
   };
 
   const effectiveMin = minValue > 0 ? minValue : minPrice;
@@ -154,17 +162,20 @@ export default function CategoryFilters({
       {maxPrice > 0 && (
         <Box>
           {sectionTitle("Price Range")}
-          <Slider
-            size="small"
-            value={[effectiveMin, effectiveMax]}
-            min={minPrice}
-            max={maxPrice}
-            step={100}
-            onChange={handlePriceChange}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(v) => `Tk ${v.toLocaleString()}`}
-            sx={{ color: "text.primary", mt: 1 }}
-          />
+          {maxPrice > minPrice ? (
+            <Slider
+              size="small"
+              value={priceRange}
+              min={minPrice}
+              max={maxPrice}
+              step={Math.max(1, Math.round((maxPrice - minPrice) / 50))}
+              onChange={handlePriceChange}
+              onChangeCommitted={handlePriceCommit}
+              valueLabelDisplay="auto"
+              valueLabelFormat={(v) => `Tk ${v.toLocaleString()}`}
+              sx={{ color: "text.primary", mt: 1 }}
+            />
+          ) : null}
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 0.5 }}>
             <Typography variant="caption" color="text.secondary">
               Tk {effectiveMin.toLocaleString()}
@@ -181,7 +192,7 @@ export default function CategoryFilters({
         <Box>
           {sectionTitle("Color")}
           <Stack spacing={0.3}>
-            {COLOR_OPTIONS.filter((c) => colors.includes(c.value)).map((c) => (
+            {colorOptions.map((c) => (
               <FormControlLabel
                 key={c.value}
                 control={

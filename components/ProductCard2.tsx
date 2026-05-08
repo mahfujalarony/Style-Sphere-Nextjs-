@@ -102,7 +102,10 @@ export default function ProductCard2({
             height: 28,
             "&:hover": { bgcolor: "rgba(255,255,255,1)" },
           }}
-          onClick={(e) => e.preventDefault()}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           <FavoriteBorderIcon sx={{ fontSize: 15, color: "#e53935" }} />
         </IconButton>

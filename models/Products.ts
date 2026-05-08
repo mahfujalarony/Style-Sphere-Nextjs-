@@ -13,6 +13,7 @@ const ProductSchema = new Schema(
 		discountTag: { type: String },
 		colors: { type: [String], default: [] },
 		sizes: { type: [String], default: [] },
+		sizeGuide: { type: String, default: "" },
         sold: { type: Number, default: 0 },
         views: { type: Number, default: 0 },
 		likes: { type: Number, default: 0 },

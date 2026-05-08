@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { PRODUCT_COLOR_OPTIONS } from "@/lib/productOptions";
 
 type CategoryOption = {
   _id: string;
@@ -14,7 +15,7 @@ const page = () => {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
 
   const colorOptions = useMemo(
-    () => ["black", "white", "beige", "nude", "brown", "gold", "silver", "red", "blue", "green", "pink"],
+    () => PRODUCT_COLOR_OPTIONS,
     []
   );
 
@@ -123,20 +124,26 @@ const page = () => {
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {colorOptions.map((color) => (
                     <label
-                      key={color}
+                      key={color.value}
                       className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-600"
                     >
                       <input
                         type="checkbox"
-                        checked={selectedColors.includes(color)}
+                        checked={selectedColors.includes(color.value)}
                         onChange={() =>
                           setSelectedColors((prev) =>
-                            prev.includes(color) ? prev.filter((item) => item !== color) : [...prev, color]
+                            prev.includes(color.value)
+                              ? prev.filter((item) => item !== color.value)
+                              : [...prev, color.value]
                           )
                         }
                         className="h-4 w-4 rounded border-slate-300"
                       />
-                      {color}
+                      <span
+                        className="h-3 w-3 rounded-full border border-slate-300"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      {color.label}
                     </label>
                   ))}
                 </div>
@@ -148,6 +155,16 @@ const page = () => {
               <input
                 name="sizes"
                 placeholder="e.g. 35, 36, 37"
+                className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-slate-400"
+              />
+            </label>
+
+            <label className="text-sm font-medium text-slate-700">
+              Size Guide / Measurements
+              <textarea
+                name="sizeGuide"
+                rows={3}
+                placeholder="Example: S = Chest 38, Length 26 | M = Chest 40, Length 27"
                 className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-slate-400"
               />
             </label>

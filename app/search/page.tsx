@@ -40,7 +40,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       image: product.images?.[0] ?? "",
       originalPrice: product.originalPrice,
       discountPrice: product.discountPrice,
-      discountTag: product.discountTag,
+      discountTag: product.discountTag ?? undefined,
     }));
   }
 

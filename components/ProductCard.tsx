@@ -30,7 +30,14 @@ const ProductCard = ({ image, title, originalPrice, discountPrice, discountTag }
         )}
 
         {/* Wishlist Icon */}
-        <button className="absolute top-3 right-3 p-1.5 bg-white/80 backdrop-blur-sm rounded-full text-gray-400 hover:text-red-500 transition-colors shadow-sm">
+        <button
+          type="button"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          className="absolute top-3 right-3 p-1.5 bg-white/80 backdrop-blur-sm rounded-full text-gray-400 hover:text-red-500 transition-colors shadow-sm"
+        >
           <Heart size={18} />
         </button>
       </div>
