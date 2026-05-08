@@ -12,8 +12,7 @@ import {
   useTheme,
   Tooltip,
 } from "@mui/material";
-import TuneIcon from "@mui/icons-material/Tune";
-import CloseIcon from "@mui/icons-material/Close";
+import { SlidersHorizontal, X } from "lucide-react";
 import CategoryFilters from "@/components/CategoryFilters";
 import ProductCard2 from "@/components/ProductCard2";
 
@@ -127,7 +126,7 @@ export default function ProductPageClient({
                     "&:hover": { bgcolor: "background.default" },
                   }}
                 >
-                  <TuneIcon sx={{ fontSize: 18 }} />
+                  <SlidersHorizontal size={18} />
                   <Typography variant="caption" sx={{ fontSize: 12, fontWeight: 600 }}>
                     Filter
                   </Typography>
@@ -187,7 +186,7 @@ export default function ProductPageClient({
                 Filters
               </Typography>
               <IconButton size="small" onClick={() => setDrawerOpen(false)}>
-                <CloseIcon fontSize="small" />
+                <X size={18} />
               </IconButton>
             </Box>
             {filterContent}

@@ -1,8 +1,8 @@
 "use client";
 
 import { Box, Typography, Chip, IconButton } from "@mui/material";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import Image from "next/image";
+import { Heart } from "lucide-react";
 
 interface ProductCardProps {
   image: string;
@@ -107,7 +107,7 @@ export default function ProductCard2({
             e.stopPropagation();
           }}
         >
-          <FavoriteBorderIcon sx={{ fontSize: 15, color: "#e53935" }} />
+          <Heart size={15} color="#e53935" />
         </IconButton>
       </Box>
 
