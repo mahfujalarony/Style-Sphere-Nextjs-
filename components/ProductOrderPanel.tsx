@@ -117,9 +117,7 @@ export default function ProductOrderPanel({ productId, colors, sizes, sizeGuide 
         />
       </div>
 
-      {!isSelectionValid && (requiresColor || requiresSize) && (
-        <p className="text-sm text-rose-500">Please select the required options to continue.</p>
-      )}
+
 
       <Button
         startIcon={<ShoppingCartIcon />}
